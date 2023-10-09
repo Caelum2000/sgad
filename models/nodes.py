@@ -14,7 +14,6 @@ from torch.nn import functional as F
 from torchvision.utils import save_image
 from numbers import Number
 from torch.autograd import Variable
-import models.utils_my as utils_my
 
 ALPHA = 2.
 
@@ -449,80 +448,6 @@ class ScoringMP(BaseNode):
             self.integral(inputs)
             self.calc_spike()
             return self.spike
-
-
-class Scoring_MP_IbAtt(BaseNode):
-
-    def __init__(self, num_sample, dataset_name="MNIST"):
-        super().__init__()
-
-        if dataset_name == "MNIST" or dataset_name == "FashionMNIST":
-            self.channel = 1
-            self.hw = 28
-        elif dataset_name == "CIFAR-10":
-            self.channel = 3
-            self.hw = 32
-        elif dataset_name == "CelebA":
-            self.channel = 3
-            self.hw = 64
-
-        self.num_sample = num_sample
-        self.att_module_mu = nn.Sequential(
-            nn.Conv2d(2 * self.channel, 1, 3, stride=1, padding=1), nn.ReLU(),
-            nn.Flatten(), nn.Linear(self.hw * self.hw, 1),
-            nn.Sigmoid())  # add sigmoid here
-        self.att_module_std = nn.Sequential(
-            nn.Conv2d(2 * self.channel, 1, 3, stride=1, padding=1), nn.ReLU(),
-            nn.Flatten(), nn.Linear(self.hw * self.hw, 1))
-
-    def calc_spike(self):
-        self.spike = self.mem
-
-    def integral(self, inputs):
-        # inputs.shape = (bs,c,h,w)
-        # self.mem.shape = (bs,c,hw)
-        if isinstance(self.mem, float):
-            self.mem = torch.zeros_like(inputs)
-        f = torch.concat([inputs, self.mem], dim=1)  # (bs,2*c,h,w)
-        att_mu = self.att_module_mu(f)  # (bs,2)
-        att_std = self.att_module_std(f)
-        att_std = F.softplus(att_std - 5, beta=1)
-
-        att_mask = self.reparametrize_n(att_mu, att_std,
-                                        self.num_sample)  # (ns,bs,2)
-        att_mask = att_mask.mean(0)
-
-        mem_score = att_mask[:, 0] / (att_mask.sum(dim=1))  # (b,)
-        inputs_score = 1 - mem_score
-
-        self.mem = self.mem * mem_score.view(
-            -1, 1, 1, 1) + inputs * inputs_score.view(-1, 1, 1, 1)
-
-    def forward(self, inputs):
-        if self.weight_warmup:
-            return inputs
-        else:
-            self.integral(inputs)
-            self.calc_spike()
-            return self.spike
-
-    def reparametrize_n(self, mu, std, n=1):
-        # reference :
-        # http://pytorch.org/docs/0.3.1/_modules/torch/distributions.html#Distribution.sample_n
-        def expand(v):
-            if isinstance(v, Number):
-                return torch.Tensor([v]).expand(n, 1)
-            else:
-                return v.expand(n, *v.size())
-
-        if n != 1:
-            mu = expand(mu)
-            std = expand(std)
-
-        eps = Variable(
-            utils_my.cuda(std.data.new(std.size()).normal_(), std.is_cuda))
-
-        return mu + eps * std
 
 
 class mem_encoder_1(nn.Module):

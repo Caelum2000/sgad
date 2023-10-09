@@ -1,0 +1,2 @@
+python train/train_sgad_mnist.py --config train/sgad_mnist.yaml
+python train/train_sgad_celeba.py --config train/sgad_celeba.yaml

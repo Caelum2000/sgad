@@ -2,7 +2,7 @@ import sys
 import os
 
 sys.path.append(os.getcwd())
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "8"
 
 import torch
 from torch import nn
