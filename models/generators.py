@@ -216,3 +216,44 @@ class Generator_MP_CelebA(nn.Module):
             output = torch.stack(output, dim=0)
             img_spike = self.sig(output)
         return img_spike
+
+
+class Generator_SNN(nn.Module):
+
+    def __init__(self, input_dim):
+        super().__init__()
+        self.encoder = Encoder(step=glv.network_config['n_steps'],
+                               device=glv.network_config['device'],
+                               encode_type=glv.network_config['encode_type'])
+        self.fc1 = nn.Linear(input_dim, 32 * 32)
+        self.br1 = nn.Sequential(
+            nn.BatchNorm1d(1024),
+            LIFNode()  # nn.ReLU()
+        )
+        self.fc2 = nn.Linear(32 * 32, 128 * 7 * 7)
+        self.br2 = nn.Sequential(
+            nn.BatchNorm1d(128 * 7 * 7),
+            LIFNode()  # nn.ReLU()
+        )
+        self.conv1 = nn.Sequential(
+            nn.ConvTranspose2d(128, 64, 4, stride=2, padding=1),
+            nn.BatchNorm2d(64),
+            LIFNode()  # nn.ReLU(),
+        )
+        self.conv2 = nn.Sequential(
+            nn.ConvTranspose2d(64, 1, 4, stride=2, padding=1),
+            LIFNode()  # nn.Sigmoid()  # nn.Tanh()
+        )
+
+    def forward(self, input):
+        input = self.encoder(input)
+        # input.shape = (num_steps,...)
+        output = []
+        for x in input:
+            x = self.br1(self.fc1(x))
+            x = self.br2(self.fc2(x))
+            x = x.reshape(-1, 128, 7, 7)
+            x = self.conv1(x)
+            x = self.conv2(x)
+            output.append(x)
+        return torch.stack(output, dim=0)  # return.shape = (num_steps,...)

@@ -141,3 +141,25 @@ class Discriminator_Mix_CelebA(nn.Module):
         x = self.fc1(x)
         x = self.fc2(x)
         return x
+
+
+class Discriminator_MP(nn.Module):
+
+    def __init__(self):
+        super().__init__()
+        self.encoder = Encoder(step=glv.network_config['n_steps'],
+                               device=glv.network_config['device'],
+                               encode_type=glv.network_config['encode_type'])
+        self.net = nn.Sequential(nn.Linear(784, 400), LIFNode(),
+                                 nn.Linear(400, 1), MPNode())
+        self.sig = nn.Sigmoid()
+
+    def forward(self, inputs, is_imgs=False):
+        if is_imgs:
+            inputs = self.encoder(inputs)
+        output = []
+        for x in inputs:
+            x = self.net(x)
+            output.append(x)
+        res_mem = output[-1] / glv.network_config['n_steps']  # (batch_size, 1)
+        return self.sig(res_mem)
