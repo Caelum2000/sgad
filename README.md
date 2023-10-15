@@ -4,9 +4,7 @@ This is the code implementation for the paper "Spiking Generative Adversarial Ne
 
 This project includes implementations of three models (SGAN, SWGAN and SGAD) on two datasets (MNIST and CelebA).
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Build Status](https://travis-ci.com/username/projectname.svg?branch=master)](https://travis-ci.com/username/projectname)
-
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ## Table of Contents
 
@@ -32,7 +30,7 @@ git clone https://github.com/Caelum2000/sgad.git
 cd sgad
 
 # Install dependencies
-npm install
+pip install -r requirements.txt
 
 ```
 
