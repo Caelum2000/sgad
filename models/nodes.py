@@ -299,6 +299,9 @@ class ScoringMP(BaseNode):
             elif dataset_name == "CelebA":
                 self.down_sample_net = nn.Sequential(
                     nn.Flatten(), nn.Linear(3 * 64 * 64, 1024), nn.ReLU())
+            elif dataset_name == "dvs_64":
+                self.down_sample_net = nn.Sequential(
+                    nn.Flatten(), nn.Linear(2 * 64 * 64, 1024), nn.ReLU())
             self.scoring_function = AttentionScoring_1(1024, 1024, 256)
 
     def integral(self, inputs):
