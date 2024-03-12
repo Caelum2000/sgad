@@ -252,3 +252,22 @@ class Discriminator_EM_DVS_28(nn.Module):
         # output.shape = (n_steps, batch_size, 1)
         res_mem = output[-1] / glv.network_config['n_steps']  # (batch_size, 1)
         return res_mem
+
+
+class Discriminator_MP_DVS_28(nn.Module):
+
+    def __init__(self):
+        super().__init__()
+        self.net = nn.Sequential(nn.Linear(784 * 2, 400), LIFNode(),
+                                 nn.Linear(400, 1), MPNode())
+        self.sig = nn.Sigmoid()
+
+    def forward(self, inputs):
+        # print(1111)
+        output = []
+        for x in inputs:
+            x = self.net(x)
+            output.append(x)
+
+        res_mem = output[-1] / glv.network_config['n_steps']  # (batch_size, 1)
+        return self.sig(res_mem)

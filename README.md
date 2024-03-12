@@ -14,7 +14,7 @@ This project includes implementations of three models (SGAN, SWGAN and SGAD) on 
 
 ## Abstract
 
-Generative models based on neural networks present a substantial challenge within deep learning. As it stands, such models are primarily limited to the domain of artificial neural networks. Spiking neural networks, as the third generation of neural networks, offer a closer approximation to brain-like processing due to their rich spatiotemporal dynamics. However, generative models based on spiking neural networks are not well studied. Particularly, previous works on generative adversarial networks based on spiking neural networks are conducted on simple datasets and do not perform well. In this work, we pioneer constructing a spiking generative adversarial network capable of handling complex images and having higher performance. Our first task was to identify the problems of out-of-domain inconsistency and temporal inconsistency inherent in spiking generative adversarial networks. We addressed these issues by incorporating the Earth-Mover distance and an attention-based weighted decoding method, significantly enhancing the performance of our algorithm across several datasets. Experimental results reveal that our approach outperforms existing methods on the MNIST, FashionMNIST, CIFAR10, and CelebA datasets. Moreover, compared with hybrid spiking generative adversarial networks, where the discriminator is an artificial analog neural network, our methodology demonstrates closer alignment with the information processing patterns observed in the mouse. Our code could be found at https://github.com/Caelum2000/sgad
+Generative models based on neural networks present a substantial challenge within deep learning. As it stands, such models are primarily limited to the domain of artificial neural networks. Spiking neural networks, as the third generation of neural networks, offer a closer approximation to brain-like processing due to their rich spatiotemporal dynamics. However, generative models based on spiking neural networks are not well studied. Particularly, previous works on generative adversarial networks based on spiking neural networks are conducted on simple datasets and do not perform well. In this work, we pioneer constructing a spiking generative adversarial network capable of handling complex images and having higher performance. Our first task was to identify the problems of out-of-domain inconsistency and temporal inconsistency inherent in spiking generative adversarial networks. We addressed these issues by incorporating the Earth-Mover distance and an attention-based weighted decoding method, significantly enhancing the performance of our algorithm across several datasets. Experimental results reveal that our approach outperforms existing methods on the MNIST, FashionMNIST, CIFAR10, and CelebA datasets.Besides these static datasets, we also firstly attempt at generating event-based data on NMNIST dataset. Moreover, compared with hybrid spiking generative adversarial networks, where the discriminator is an artificial analog neural network, our methodology demonstrates closer alignment with the information processing patterns observed in the mouse. Our code could be found at https://github.com/Caelum2000/sgad
 
 ![Description of Image](resources/overview.png)
 
@@ -52,6 +52,9 @@ python train/train_swgan_mnist.py --config train/swgan_mnist.yaml
 
 # Run SWGAN on CelebA
 python train/train_swgan_celeba.py --config train/swgan_celeba.yaml
+
+# Run on NMNIST
+python train/train_nmnist.py --config train/nmnist_28.yaml
 ```
 
 ### Custom Run
@@ -79,3 +82,13 @@ Network:
   checkpoint_path: ""  # checkpoint path
   scoring_mode: "AttentionScoring_RGB"  # attention scoring mode
 ```
+
+
+## Dynamic Visualization on NMNIST
+
+### Sample from SGAD
+![Description of Image](resources/nmnist_sgad.gif)
+
+### Sample from SWGAN
+
+![Description of Image](resources/nmnist_swgan.gif)
